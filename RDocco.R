@@ -1,13 +1,13 @@
 # ## Introduction
 # RDocco is an R-language port of [Docco](http://jashkenas.github.com/docco/),
-# the quick-and-dirty, literate-programming-style, documentation generator. It 
+# the quick-and-dirty, literate-programming-style, documentation generator. It
 # produces human-readable HTML that displays your comments alongside your code.
 
-# RDocco supports [Markdown](http://en.wikipedia.org/wiki/Markdown), a 
+# RDocco supports [Markdown](http://en.wikipedia.org/wiki/Markdown), a
 # lightweight markup language, for formatting of in-source comments. For
 # example,
-#  + `**bold**` is **bold** 
-#  + `*emphasis*` is _emphasis_ 
+#  + `**bold**` is **bold**
+#  + `*emphasis*` is _emphasis_
 #  + `~~strikethrough~~` is ~~strikethrough~~.
 #  + `[a link](http://google.com)` is [a link](http://google.com).
 
@@ -16,7 +16,7 @@
 # header
 # ```
 # #' Multiply two numbers together
-# #' 
+# #'
 # #' This function calculates the product of two numbers.
 # #' @param num_one the first factor
 # #' @param num_two the second factor
@@ -25,7 +25,7 @@
 # renders as:
 
 #' Multiply two numbers together
-#' 
+#'
 #' This function calculates the product of two numbers.
 #' @param num_one the first factor
 #' @param num_two the second factor
@@ -33,13 +33,13 @@
 
 # ---------------------
 
-# This script was modeled after [Jocco] (http://lcw.github.com/jocco/), a Docco 
-# port for the [Julia] (http://julialang.org/) language. Jocco uses external 
-# tools for syntax highlighting and Markdown rendering, but we opt for 
-# existing R-packages to handle these tasks. 
+# This script was modeled after [Jocco] (http://lcw.github.com/jocco/), a Docco
+# port for the [Julia] (http://julialang.org/) language. Jocco uses external
+# tools for syntax highlighting and Markdown rendering, but we opt for
+# existing R-packages to handle these tasks.
 
-# Presently, RDocco supports [MathJax](http://mathjax.com/) rendering of 
-# \(\LaTeX\) math equations using the delimiters `\(...\)` (no spaces!) for 
+# Presently, RDocco supports [MathJax](http://mathjax.com/) rendering of
+# \(\LaTeX\) math equations using the delimiters `\(...\)` (no spaces!) for
 # inline math (e.g., \(a^2 + b^2 = c^2\)) equations and `\[ ... \]` for block
 # equations: \[ \left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n
 # a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right) \] Which is a desirable
@@ -47,7 +47,7 @@
 
 # ## Actual Code Comments
 # #### Load supporting packages.
-# + [stringr](http://cran.r-project.org/web/packages/stringr/) does the heavy 
+# + [stringr](http://cran.r-project.org/web/packages/stringr/) does the heavy
 #   lifting for string-processing.
 # + [highlight](http://cran.r-project.org/web/packages/highlight/) performs
 #   syntax highlighting on code chunks.
@@ -63,7 +63,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 # each row consists of a comment-code pairing. These three string constants
 # make an HTML sandwich. `.HEADER` and `.FOOTER` are the slices of bread and
 # establish the start and end of the table. `.TABLE_ENTRY` provides the template
-# for the sandwich fillings---i.e., the rows of the table. 
+# for the sandwich fillings---i.e., the rows of the table.
 .HEADER <- "<!DOCTYPE html>
 <html><head>
   <title>%title%</title>
@@ -76,12 +76,12 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 
     /*----------------- Layout and Typography ------------------------*/
     body {
-      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, 
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino,
                     FreeSerif, serif;
       font-size: 15px;
       line-height: 22px;
       color: #252519;
-      margin: 0; 
+      margin: 0;
       padding: 0;
     }
 
@@ -98,7 +98,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
       border-left: 1px solid #e5e5ee;
       z-index: -1;
     }
-    
+
     #jump_to, #jump_page {
       background: white;
       -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
@@ -125,7 +125,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
       text-decoration: none;
       border-top: 1px solid #eee;
     }
-    
+
     #jump_page .source:hover        { background: #f5f5ff; }
     #jump_page .source:first-child  { }
 
@@ -176,7 +176,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
     pre .functioncall       { color: #954121; }
     pre .string             { color: #219161; }
     pre .keyword            { font-weight: bolder; color: #000; }
-    pre .argument           { color: #19469D; } 
+    pre .argument           { color: #19469D; }
     pre .comment            { color: #2E9957; }
     pre .roxygencomment     { color: #707AB3; }
     pre .formalargs         { color: #19469D; }
@@ -187,7 +187,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
     pre .symbol             { color: #000 ;}
     pre .prompt             { color: #333 ;}
   </style>
-  <script type=\"text/javascript\" 
+  <script type=\"text/javascript\"
     src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\"></script>
 </head>
 <body>
@@ -218,26 +218,26 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 </body></html>"
 
 #' Extract comments and code chunks from a .R file
-#' 
+#'
 #' @param src a character string specifying the path to the .R file we want to
 #'   process
 #' @return a list of 3 character vectors containing the chunks of code, chunks
 #'   of plain comments, and chunks of Roxygen-style comments.
 .ParseSource <- function(src) {
-  # Read in the lines of the input script and initalize values. 
+  # Read in the lines of the input script and initalize values.
   lines <- readLines(src)
   code <- character()
   docs <- character()
   has_code <- FALSE
   code_text <- ""
   docs_text <- ""
-  
+
   # _Regular expression for matching comments_
   rx_COMMENT <- perl("^\\s*(?:(#)+(')?\\s(.*?)\\s*$)")
-  
-  # Search for a comment match on each line of the input file. `has_code` 
-  # records whether the last line that was scanned contained code-like text. As 
-  # long as `has_code` doesn't change, we lump successive lines together into 
+
+  # Search for a comment match on each line of the input file. `has_code`
+  # records whether the last line that was scanned contained code-like text. As
+  # long as `has_code` doesn't change, we lump successive lines together into
   # `code_text` or `docs_text`. Those lumped-together get written onto `code` or
   # `docs` once `has_code` changes.
   for (line in lines) {
@@ -255,8 +255,8 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
       has_code <- TRUE
       code_text <- str_c(code_text, line, "\n")
     } else {
-      # Otherwise, if there is a match to the comment pattern, _and_ the 
-      # previous line contained code, update the code texts and reset 
+      # Otherwise, if there is a match to the comment pattern, _and_ the
+      # previous line contained code, update the code texts and reset
       # initialization values.
       if (has_code) {
         code <- c(code, code_text)
@@ -267,7 +267,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
       }
       # Update the documentation with the current line.
       doc_line <- match
-      docs_text <- str_c(docs_text, doc_line, "\n") 
+      docs_text <- str_c(docs_text, doc_line, "\n")
     }
   }
   # Append the final code and documentation chunks to their text vectors. Trim
@@ -299,15 +299,15 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 }
 
 #' Highlight R code
-#' 
+#'
 #' We can only highlight syntactically valid R code, and most of the individual
-#' chunks are not valid. If we put all the chunks back together, then we can 
-#' highlight the R code (assuming the input file contained valid code). In 
-#' order to break apart the highlighted code, we need to mark each place where 
+#' chunks are not valid. If we put all the chunks back together, then we can
+#' highlight the R code (assuming the input file contained valid code). In
+#' order to break apart the highlighted code, we need to mark each place where
 #' we concatenated chunks together and then break up the code at those markers
 #' places. We also need to preserve newline characters in strings, so that
 #' multi-line strings are not collapsed onto super-long single lines.
-#' 
+#'
 #' @param code_array a character vector containing chunks of un-highlighted R
 #'   code
 #' @return a character vector of syntax-highlighted R code in HTML
@@ -318,7 +318,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   sep <- str_c(sep_part_1, sep_part_2)
   code_array <- str_replace_all(code_array, "\\n", str_c(sep, "\n"))
   # Combine the chunks of R code together, marking where chunks are concatenated
-  # together. 
+  # together.
   code_sep <- "# CUT HERE\n"
   code_array <- str_c(code_array, collapse = code_sep)
   # Open a text connection on the code and capture the output of highlighting
@@ -326,8 +326,8 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   con <- textConnection(code_array)
   on.exit(close(con))
   code_array <- capture.output({
-    highlight(con, renderer = renderer_html(document = FALSE, 
-                                            header = function() '', 
+    highlight(con, renderer = renderer_html(document = FALSE,
+                                            header = function() '',
                                             footer = function() ''),
               encoding = "unknown")
   })
@@ -345,15 +345,15 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 
 
 #' Parse a Roxygen comment
-#' 
-#' This function parses a Roxygen comment and extracts the first line of the 
-#' comment, any introductory text, and the names and values of any @@-tags in 
+#'
+#' This function parses a Roxygen comment and extracts the first line of the
+#' comment, any introductory text, and the names and values of any @@-tags in
 #' the comment. The parsing function below was adapted from [the parsing
 #' function in Roxygen2]
 #' (https://github.com/yihui/roxygen2/blob/master/R/parse-preref.R).
-#' 
+#'
 #' #### About Roxygen
-#' 
+#'
 #' Documentation for R packages takes place in special `.Rd` files. This
 #' organization is problematic because the doc is stored in a separate file from
 #' the code it describes, so it takes extra work to keep documentation up to
@@ -362,14 +362,14 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 #' _in-source_ comments. A Roxygen comment sits above the the function it
 #' describes, is set off with special `#'` comment marks, and information about
 #' the function is described with tags like `@@params` or `@@author`. (Read more
-#' about R documentation in [this Wiki entry] 
-#' (https://github.com/hadley/devtools/wiki/docs-function) from the devtools 
+#' about R documentation in [this Wiki entry]
+#' (https://github.com/hadley/devtools/wiki/docs-function) from the devtools
 #' package.). Roxygen2 then transforms these comments into `.Rd` files.
-#' 
+#'
 #' Roxygen-style comments seem like a pretty good practice for R coding, because
-#' they succinctly describe pertinent information about functions in a 
+#' they succinctly describe pertinent information about functions in a
 #' structured way. They are also supported by [RStudio] (http://rstudio.org/).
-#' 
+#'
 #' @param lines chunks of text that may contain Roxygen-style comments
 #' @return a list of Roxygen elements, or an empty list if the input text not
 #'   contain any Roxygen comments
@@ -392,7 +392,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # Split the Roxygen comment into @-labels chunks
   elements <- strsplit(joined_lines, '(?<!@)@(?!@)', perl = TRUE)[[1]]
   elements <- str_replace_all(elements, fixed("@@"), "@")
-  
+
   # Parse the first line of a Roxygen comment block and any text that follows
   .ParseIntro <- function(expression) {
     if (.is.null.string(expression)) return(NULL)
@@ -411,27 +411,27 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
     names(rest)[1] <- tag
     return(rest)
   }
-    parsed_elements <- unlist(lapply(elements[-1], .ParseElement), 
+    parsed_elements <- unlist(lapply(elements[-1], .ParseElement),
                             recursive = FALSE)
   return(c(parsed_introduction, parsed_elements))
 }
 
 #' Insert Roxygen-style comments into Markdown templates
-#' 
+#'
 #' RDocco applies Markdown formatting to the content of a Roxygen comment.
 #' Specifically, the first line of a Roxygen block is formatted as an `<h3>`
 #' element. The following Roxygen `@@`-tags are then formatted, if present:
 #' `@@param` tags are combined and output as a table, `@@return` is output as a
 #' table (assuming there is only one `@@return` tag), and `@@TODO` tags (which I
 #' invented) are combined and output as an unordered list.
-#' 
+#'
 #' **Note:** In order to write those @@-signs in this Roxygen comment, I had to
 #' double up on them as an escape: `@@@@` renders as  "@@".
-#' 
+#'
 #' @TODO Make Markdown lists work in the Roxygen comments
 #' @TODO Generate template for `@@note` tags.
 #' @TODO Generate template for `@@examples` tags.
-#' 
+#'
 #' @param roxy_lines a `list` of Roxygen comments. The names of the list element
 #'   tell us what kind of Roxygen comment each element is.
 #' @return a Markdown-formatted string of the input Roxygen-style comments, or
@@ -477,7 +477,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
     returns <- c(table_header, returns)
     returns <- str_c(returns, collapse = "\n")
     returns <- str_c(returns, "\n")
-    roxy_lines$"return" <- returns 
+    roxy_lines$"return" <- returns
   }
   # The first line of the Roxygen block gets formatted as an `<h3>`.
   line_class <- unlist(attributes(roxy_lines), use.names = FALSE)
@@ -496,7 +496,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
     TODOs <- c(list_header, TODOs)
     TODOs <- str_c(TODOs, collapse = "\n")
     TODOs <- str_c(TODOs, "\n")
-    # Since we are combining elements into one `@TODO` list, we remove all 
+    # Since we are combining elements into one `@TODO` list, we remove all
     # `@TODO` lines beyond the first.
     roxy_lines[TODO_lines[-1]] <- NULL
     roxy_lines$TODO <- TODOs
@@ -516,17 +516,17 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 }
 
 #' Convert Markdown-formatted strings into HTML
-#' 
+#'
 #' @param doc_array a character vector containing Markdown-formatted strings
 #' @return an HTML-formatted version of the input character vector
 .MarkItDown <- function(doc_array) {
-  cust_extensions <- c("no_intra_emphasis", "tables", "fenced_code", "autolink", 
-                       "strikethrough", "lax_spacing", "space_headers", 
+  cust_extensions <- c("no_intra_emphasis", "tables", "fenced_code", "autolink",
+                       "strikethrough", "lax_spacing", "space_headers",
                        "latex_math")
   for (line_num in 1:length(doc_array)) {
     line <- doc_array[line_num]
     if(line != "") {
-      line <- markdownToHTML(text = line, extensions = cust_extensions) 
+      line <- markdownToHTML(text = line, extensions = cust_extensions)
     }
     doc_array[line_num] <- line
   }
@@ -535,13 +535,13 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 
 #' Generate literate documentation from Markdown-formatted comments in an R
 #' script
-#' 
+#'
 #' This is the main formatting function. `Doccofy` loads the source R script,
 #' parses the comments from the code, highlights the code, inserts the contents
-#' of Roxygen comments into Markdown templates, combines the processed Roxygen 
-#' comments with regular comments, converts the Markdown-formatted test into 
+#' of Roxygen comments into Markdown templates, combines the processed Roxygen
+#' comments with regular comments, converts the Markdown-formatted test into
 #' HTML, and then builds the final HTML output file.
-#' 
+#'
 #' @param src the path to the R script
 #' @return nothing is returned, but a `[src].html` file is generated in the
 #'   source file's directory
@@ -550,14 +550,14 @@ Doccofy <- function(src) {
   title <- unlist(str_split(src, "/"))
   title <- title[length(title)]
   header <- str_replace_all(.HEADER, "%title%", title)
-  
+
   # Parse the input file into code chunks, plain-comment `#` chunks and
   # Roxygen-style `#'` comment chunks.
   parsed <- .ParseSource(src)
   code <- parsed$code
   docs <- parsed$docs
   rdocs <- parsed$rdocs
-  
+
   # Format documentation text in each set of comments. Merge `#` and `#'`
   # chunks back to together.
   rdocs <- Map(.ParseRoxygen, rdocs)
@@ -565,23 +565,23 @@ Doccofy <- function(src) {
   rdoc_lines <- which(!str_detect(rdocs, "^$"))
   docs[rdoc_lines] <- rdocs[rdoc_lines]
   docs <- .MarkItDown(docs)
-  
-  # Replace escaped backslashes with HTML entities. This lets us do \(\LaTeX\), 
+
+  # Replace escaped backslashes with HTML entities. This lets us do \(\LaTeX\),
   # but we might (?) face problems rendering escape characters in our
   # documentation.
   docs <- str_replace_all(docs, "\\\\", "&#92;")
-  
+
   # Highlight code. Remove unnecessary line-breaks at the ends of code chunks.
   # Preserve escape sequences in strings by doubling up on escape characters.
   code <- .HighlightCode(code)
   code <- str_replace_all(code, "<br/>$", "")
   code <- str_replace_all(code, "\\\\", "\\\\\\\\")
-  
+
   # Plug the formatted documentation and highlighted code chunks together into
   # our `.TABLE_ENTRY` HTML template.
   formatted <- character(length(code))
-  for (chunk_num in 1:length(code)) {  
-    table_row <- str_replace_all(.TABLE_ENTRY, "%index%", chunk_num)  
+  for (chunk_num in 1:length(code)) {
+    table_row <- str_replace_all(.TABLE_ENTRY, "%index%", chunk_num)
     table_row <- str_replace_all(table_row, "%docs_html%", docs[chunk_num])
     table_row <- str_replace_all(table_row, "%code_html%", code[chunk_num])
     formatted[chunk_num] <- table_row
