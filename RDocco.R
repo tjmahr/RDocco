@@ -576,13 +576,19 @@ Doccofy <- function(src) {
   code <- str_replace_all(code, "<br/>$", "")
   code <- str_replace_all(code, "\\\\", "\\\\\\\\")
 
+  # An alternative string replacement function that doesn't use regular
+  # expressions.
+  str_replace_gsub <- function(string, pattern, replacement) {
+    gsub(pattern, replacement, string, fixed = TRUE)
+  }
+
   # Plug the formatted documentation and highlighted code chunks together into
   # our `.TABLE_ENTRY` HTML template.
   formatted <- character(length(code))
   for (chunk_num in 1:length(code)) {
     table_row <- str_replace_all(.TABLE_ENTRY, "%index%", chunk_num)
-    table_row <- str_replace_all(table_row, "%docs_html%", docs[chunk_num])
-    table_row <- str_replace_all(table_row, "%code_html%", code[chunk_num])
+    table_row <- str_replace_gsub(table_row, "%docs_html%", docs[chunk_num])
+    table_row <- str_replace_gsub(table_row, "%code_html%", code[chunk_num])
     formatted[chunk_num] <- table_row
   }
   # Put our HTML sandwich together and output the final file.
