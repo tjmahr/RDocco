@@ -321,10 +321,9 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # together.
   code_sep <- "# CUT HERE\n"
   code_array <- str_c(code_array, collapse = code_sep)
-  # Open a text connection on the code and capture the output of highlighting
-  # the code.
-  con <- textConnection(code_array)
-  on.exit(close(con))
+  # Write the code to a temporary file so it can be syntax-highlighted.
+  con <- tempfile()
+  writeLines(code_array, con)
   code_array <- capture.output({
     highlight(con, renderer = renderer_html(document = FALSE,
                                             header = function() '',
