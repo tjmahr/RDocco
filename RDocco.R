@@ -352,7 +352,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 #' comment, any introductory text, and the names and values of any @@-tags in
 #' the comment. The parsing function below was adapted from [the parsing
 #' function in Roxygen2]
-#' (https://github.com/yihui/roxygen2/blob/master/R/parse-preref.R).
+#' (https://github.com/yihui/roxygen2/blob/7ec00dbc03e8166ba82fbc5272c1566d2b3feed9/R/parse-preref.R).
 #'
 #' #### About Roxygen
 #'
