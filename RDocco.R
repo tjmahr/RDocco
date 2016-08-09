@@ -295,7 +295,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   docs <- str_replace_all(docs, rx_INITIAL, "")
   docs <- str_replace_all(docs, rx_NEWLINE, "\n")
   parsed <- list(code = code, docs = docs, rdocs = rdocs)
-  return (parsed)
+  return(parsed)
 }
 
 #' Highlight R code
@@ -311,7 +311,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 #' @param code_array a character vector containing chunks of un-highlighted R
 #'   code
 #' @return a character vector of syntax-highlighted R code in HTML
-.HighlightCode <- function (code_array) {
+.HighlightCode <- function(code_array) {
   # Preserve escaped newline characters by marking them.
   sep_part_1 <- "#%BREAK%"
   sep_part_2 <- "#%HERE%"
@@ -437,8 +437,8 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
 #' @return a Markdown-formatted string of the input Roxygen-style comments, or
 #'   an empty string on empty input
 .DressUpRoxy <- function(roxy_lines) {
-  if (length(roxy_lines) == 0){
-    return ("")
+  if (length(roxy_lines) == 0) {
+    return("")
   }
   # _Support function for cleaning up Roxygen lines before formatting them_
   .FetchLines <- function(line) {
@@ -454,7 +454,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # lines by extracting and combining `@param` lines into a table.
   line_class <- unlist(attributes(roxy_lines), use.names = FALSE)
   param_lines <- which(str_detect(line_class, "param"))
-  if(length(param_lines) > 0) {
+  if (length(param_lines) > 0) {
     table_header <- "|Parameters |      |\n|------|------|"
     params <- .FetchLines(roxy_lines[param_lines])
     params <- str_replace(params, "^\\s*(\\S+)\\s+(.*)", "| `\\1` | \\2 |")
@@ -470,7 +470,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # a table.
   line_class <- unlist(attributes(roxy_lines), use.names = FALSE)
   return_lines <- which(str_detect(line_class, "return"))
-  if(length(return_lines) > 0) {
+  if (length(return_lines) > 0) {
     table_header <- "| Returns |      |\n|------|------|"
     returns <- .FetchLines(roxy_lines[return_lines])
     returns <- str_c("| | ", returns, " |")
@@ -482,14 +482,14 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # The first line of the Roxygen block gets formatted as an `<h3>`.
   line_class <- unlist(attributes(roxy_lines), use.names = FALSE)
   first_line <- which(str_detect(line_class, "first_line"))
-  if(length(first_line) > 0) {
+  if (length(first_line) > 0) {
     roxy_lines$first_line <- .FetchLines(roxy_lines[first_line])
     roxy_lines$first_line <- str_c("### ", roxy_lines$first_line, "\n")
   }
   # Extract any `@TODO` elements and combine them into a list.
   line_class <- unlist(attributes(roxy_lines), use.names = FALSE)
   TODO_lines <- which(str_detect(line_class, "TODO"))
-  if(length(TODO_lines) > 0) {
+  if (length(TODO_lines) > 0) {
     list_header <- "**TODO**\n"
     TODOs <- .FetchLines(roxy_lines[TODO_lines])
     TODOs <- str_c("+ ", TODOs)
@@ -505,7 +505,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # text, so these are combined together.
   line_class <- unlist(attributes(roxy_lines), use.names = FALSE)
   introduction <- which(str_detect(line_class, "introduction"))
-  if(length(first_line) > 0) {
+  if (length(first_line) > 0) {
     intros <- .FetchLines(roxy_lines[introduction])
     intros <- str_c(intros, collapse = "\n\n")
     intros <- str_c(intros, "\n")
@@ -525,7 +525,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
                        "latex_math")
   for (line_num in 1:length(doc_array)) {
     line <- doc_array[line_num]
-    if(line != "") {
+    if (line != "") {
       line <- markdownToHTML(text = line, extensions = cust_extensions)
     }
     doc_array[line_num] <- line
