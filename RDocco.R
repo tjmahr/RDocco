@@ -1,4 +1,5 @@
 # ## Introduction
+
 # RDocco is an R-language port of [Docco](http://jashkenas.github.com/docco/),
 # the quick-and-dirty, literate-programming-style, documentation generator. It
 # produces human-readable HTML that displays your comments alongside your code.
@@ -14,6 +15,7 @@
 # This script also automatically formats [Roxygen2]
 # (https://github.com/yihui/roxygen2)-style R comments, so that this function
 # header
+
 # ```
 # #' Multiply two numbers together
 # #'
@@ -22,6 +24,7 @@
 # #' @param num_two the second factor
 # #' @return the product of the two numbers
 # ```
+
 # renders as:
 
 #' Multiply two numbers together
@@ -233,7 +236,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   docs_text <- ""
 
   # _Regular expression for matching comments_
-  rx_COMMENT <- perl("^\\s*(?:(#)+(')?\\s(.*?)\\s*$)")
+  rx_COMMENT <- perl("^\\s*(?:(#)+(')?(\\s.*)?\\s*$)")
 
   # Search for a comment match on each line of the input file. `has_code`
   # records whether the last line that was scanned contained code-like text. As
@@ -382,8 +385,9 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # Grab lines starting with the Roxygen pattern and trim trailing (right-sided)
   # whitespace
   delimited_lines <- lines[str_detect(lines, rx_LINE_DELIMITER)]
-  trimmed_lines <- str_trim(str_replace(delimited_lines, rx_LINE_DELIMITER, ""),
-                            "right")
+  # Split at line breaks.
+  lines <- unlist(str_split(delimited_lines, rx_LINE_DELIMITER))
+  trimmed_lines <- str_trim(lines, "right")
   # Return an empty list if the trimmed lines are empty. Otherwise merge the
   # lines together.
   if (length(trimmed_lines) == 0) return(list())
@@ -396,7 +400,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   .ParseIntro <- function(expression) {
     if (.is.null.string(expression)) return(NULL)
     intro <- unlist(str_trim(expression))
-    intro <- unlist(str_split(intro, "\n(#' )\n"))
+    intro <- unlist(str_split(intro, "\n\\s*\n"))
     parts <- list(first_line = intro[1], introduction = intro[-1])
     return(parts)
   }
@@ -410,7 +414,7 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
     names(rest)[1] <- tag
     return(rest)
   }
-    parsed_elements <- unlist(lapply(elements[-1], .ParseElement),
+  parsed_elements <- unlist(lapply(elements[-1], .ParseElement),
                             recursive = FALSE)
   return(c(parsed_introduction, parsed_elements))
 }
@@ -442,10 +446,8 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # _Support function for cleaning up Roxygen lines before formatting them_
   .FetchLines <- function(line) {
     line <- unlist(line, use.names = FALSE)
-    # Blank out any `#'` that followed some amount of space. Then blank out any
-    # `#'` that may be followed by a newline `\n`.
-    line <- str_replace_all(line, "\\s*\\n*#'\\s+", " ")
-    line <- str_replace_all(line, "\\s*\\n*#'\\n*", " ")
+    # Remove line breaks
+    line <- str_replace_all(line, "\\s*\\n\\s*", " ")
     line <- str_trim(line)
     return(line)
   }
@@ -504,13 +506,13 @@ options(markdown.HTML.options = c('fragment_only', 'smartypants'))
   # text, so these are combined together.
   line_class <- unlist(attributes(roxy_lines), use.names = FALSE)
   introduction <- which(str_detect(line_class, "introduction"))
-  if (length(first_line) > 0) {
+  if (length(introduction) > 0) {
     intros <- .FetchLines(roxy_lines[introduction])
     intros <- str_c(intros, collapse = "\n\n")
     intros <- str_c(intros, "\n")
     roxy_lines$introduction <- intros
   }
-  roxy_lines <- str_c(unlist(roxy_lines, use.names = FALSE), collapse = "\n")
+  roxy_lines <- str_c(unlist(roxy_lines, use.names = FALSE), collapse = "\n\n")
   return(roxy_lines)
 }
 
@@ -560,7 +562,7 @@ Doccofy <- function(src) {
   # Format documentation text in each set of comments. Merge `#` and `#'`
   # chunks back to together.
   rdocs <- Map(.ParseRoxygen, rdocs)
-  rdocs <- unlist(Map(.DressUpRoxy, rdocs))
+  rdocs <- unlist(Map(.DressUpRoxy, rdocs), use.names = FALSE)
   rdoc_lines <- which(!str_detect(rdocs, "^$"))
   docs[rdoc_lines] <- rdocs[rdoc_lines]
   docs <- .MarkItDown(docs)
